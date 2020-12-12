@@ -1,0 +1,30 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col">
+                <div class="mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Credentials of simple prestashop for Freshly test</h4>
+                            <form action="{{ path('fresh_config_post_path') }}" method="post">
+                                <label for="fresh_url" class="col-sm-2 col-form-label">Url</label>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="fresh_url" name="fresh_url"
+                                           value="">
+                                </div>
+                                <label for="fresh_token" class="col-sm-2 col-form-label">Token</label>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="fresh_token" name="fresh_token"
+                                           value="">
+                                </div>
+                                <hr>
+                                <button type="submit" class="btn btn-primary">Save credentials</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

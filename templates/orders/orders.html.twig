@@ -1,0 +1,106 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID Order</th>
+                        <th scope="col">Fecha del pedido</th>
+                        <th scope="col">Nombre y apellidos de la dirección de envío</th>
+                        <th scope="col">Direccion de envio</th>
+                        <th scope="col">País de envío</th>
+                        <th scope="col">Nombre de los productos comprados</th>
+                        <th scope="col">Estado del pedido</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in simpleOrder %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.delivery_date }}</td>
+                            <td>{{ item.customer.firstname }} {{ item.customer.lastname }}</td>
+                            <td>{{ item.customer.addresses[0][0].address1 }}
+                                , {{ item.customer.addresses[0][0].address2 }}
+                                , {{ item.customer.addresses[0][0].postcode }}
+                                , {{ item.customer.addresses[0][0].city }}</td>
+                            <td>{{ item.customer.addresses[0][1].name }}</td>
+                            <td>
+                                <ul>
+                                    {% for product in item.associations.order_rows %}
+                                        <li>{{ product.product_name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>{{ item.order_state.name }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#myModal_{{ item.id }}">View order
+                                </button>
+                            </td>
+                        </tr>
+                        <div class="modal" tabindex="-1" id="myModal_{{ item.id }}">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Description of Order</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row pl-3">
+                                            <h5>ID Order</h5>
+                                            <p>{{ item.id }}</p>
+                                            <h5>Fecha del pedido</h5>
+                                            <p>{{ item.delivery_date }}</p>
+                                            <h5>Nombre y apellidos de la dirección de envío</h5>
+                                            <p>{{ item.customer.firstname }} {{ item.customer.lastname }}</p>
+                                            <h5>Direccion de envio</h5>
+                                            <p>{{ item.customer.addresses[0][0].address1 }}
+                                                , {{ item.customer.addresses[0][0].address2 }}
+                                                , {{ item.customer.addresses[0][0].postcode }}
+                                                , {{ item.customer.addresses[0][0].city }}</p>
+                                            <h5>País de envío</h5>
+                                            <p>{{ item.customer.addresses[0][1].name }}</p>
+                                            <h5>Nombre de los productos comprados</h5>
+                                            <p>
+                                            <ul>
+                                                {% for product in item.associations.order_rows %}
+                                                    <span>- {{ product.product_name }}</span><br>
+                                                {% endfor %}
+                                            </ul>
+                                            </p>
+                                            <h5>Estado del pedido</h5>
+                                            <form action="{{ path('change_status_path') }}" method="post">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <select name="select_state_{{ item.id }}" id="select_state" class="form-control">
+                                                            {% for state in order_states %}
+                                                                {{ dump(state) }}
+                                                                <option value="{{ state.id }}"
+                                                                        {% if state.name == item.order_state.name %}selected="selected"{% endif %}>{{ state.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <button type="submit" class="btn btn-success mt-3">Save changes</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+{% endblock %}
