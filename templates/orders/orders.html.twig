@@ -1,8 +1,34 @@
 {% extends "base.html.twig" %}
 {% block body %}
     <div class="container">
-        <div class="row mt-3">
+        <div class="row mt-4">
             <div class="col-12">
+                <h5>Filters</h5>
+                <form action="{{ path('index_path') }}" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="filter_select_state">Estado del pedido</label>
+                            <select name="filter_select_state" id="filter_select_state" class="form-control">
+                                <option value="">Cualquier opción</option>
+                                {% for state in order_states %}
+                                    <option value="{{ state.id }}" {% if value_select_state == state.id %}selected="selected"{% endif %}>{{ state.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="filter_check_state" class="mt-4"><input type="checkbox" name="filter_check_state" id="filter_check_state" {% if filter_check_state %}checked{% endif %} onchange="change_option()"> Mostrar solo "Pago aceptado" o "enviado"</label>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary float-end">Apply filters</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <div class="row mt-3">
+            {% if simpleOrder %}
+                <div class="col-12">
                 <table class="table">
                     <thead>
                     <tr>
@@ -99,6 +125,13 @@
                     </tbody>
                 </table>
             </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                        Sorry, there are no results.
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

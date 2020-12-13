@@ -22,14 +22,15 @@ class DefaultController extends AbstractController
         $this->client = $client;
         if (!$this->session){
             $this->session = new Session();
-            //$this->session->start();
         }
     }
 
     /**
      * @Route("/", name="index_path")
+     * @param Request $request
+     * @return object
      */
-    public function index()
+    public function index(Request $request)
     {
         $simpleOrder = [];
 
@@ -37,16 +38,36 @@ class DefaultController extends AbstractController
             return new RedirectResponse($this->generateUrl('fresh_config_path'));
         }
 
-        $orders = $this->getOrders();
-        foreach ($orders->orders as $order) {
-            array_push($simpleOrder, $this->getSimpleOrder($order->id)->order);
+        $order_states = $this->getOrderStates();
+
+        $filter = null;
+        if ($request->request->get('filter_check_state') == 'on') {
+            $filters_id = [];
+            foreach ($order_states as $orderState) {
+                if ($orderState->name == 'Pago aceptado' || $orderState->name == 'Enviado') {
+                    array_push($filters_id, $orderState->id);
+                }
+            }
+            $filter = '&filter[current_state]=['.$filters_id[0].'|'.$filters_id[1].']';
+        }
+        else if ($request->request->get('filter_select_state')) {
+            $filter = '&filter[current_state]='.$request->request->get('filter_select_state');
+        }
+
+        $orders = $this->getOrders($filter);
+        if ($orders) {
+            foreach ($orders->orders as $order) {
+                array_push($simpleOrder, $this->getSimpleOrder($order->id)->order);
+            }
         }
 
         return $this->render("orders/orders.html.twig", [
-            "simpleOrder"   => $simpleOrder,
-            "order_states"  => $this->getOrderStates(),
-            "fresh_url"     => $this->session->get('fresh_config')['fresh_url'],
-            "fresh_token"   => $this->session->get('fresh_config')['fresh_token']
+            "simpleOrder"           => $simpleOrder,
+            "value_select_state"    => $request->request->get('filter_select_state'),
+            "filter_check_state"    => $request->request->get('filter_check_state'),
+            "order_states"          => $order_states,
+            "fresh_url"             => $this->session->get('fresh_config')['fresh_url'],
+            "fresh_token"           => $this->session->get('fresh_config')['fresh_token']
         ]);
     }
 
@@ -89,9 +110,9 @@ class DefaultController extends AbstractController
         return new RedirectResponse($this->generateUrl('index_path'));
     }
 
-    public function getOrders()
+    public function getOrders($filter = '')
     {
-        $file_get = file_get_contents($this->session->get('fresh_config')['fresh_url'].'/api/orders?output_format=JSON&ws_key='.$this->session->get('fresh_config')['fresh_token']);
+        $file_get = file_get_contents($this->session->get('fresh_config')['fresh_url'].'/api/orders'.$filter.'?output_format=JSON&ws_key='.$this->session->get('fresh_config')['fresh_token']);
         return json_decode($file_get);
     }
 
