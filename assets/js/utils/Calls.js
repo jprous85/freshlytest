@@ -6,9 +6,9 @@ export function getLocalStorage() {
     const order_states = JSON.parse(document.getElementById('root').attributes['data-order-states'].nodeValue);
     const simple_order = JSON.parse(document.getElementById('root').attributes['data-simple-order'].nodeValue);
     return {
-        'credentials'   : credentials,
-        'order_states'  : order_states,
-        'simple_order'  : simple_order
+        'credentials': credentials,
+        'order_states': order_states,
+        'simple_order': simple_order
     }
 }
 
@@ -19,10 +19,10 @@ export function fillModalDataOrder(order) {
         'custom_name',
         'address',
         'country'
-    ]; 
+    ];
     const body = document.getElementById('modal-body');
     body.innerHTML = '';
-    
+
     array_values.map(av => {
         body.appendChild(createParagraph(order, av));
     })
@@ -114,24 +114,53 @@ function createModalSelectStates(order) {
 }
 
 function changeSelectListOrder(id, e) {
-    
-    const {credentials} = getLocalStorage();
-    axios.post(`${credentials.fresh_url}/api/orders/${id}?output_format=JSON&ws_key=${credentials.fresh_token}`, {
-        'body': {
-            'current_state': 1
+
+    let id_current_state = 0;
+    const {credentials, order_states} = getLocalStorage();
+    order_states.map(os => {
+        if (os.name === e.target.value) {
+            id_current_state = os.id;
         }
-    }, {
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Headers": "*"
-        }
-    }).then((res) => {
-        console.log(res);
-    }).catch((err) => {
-        console.log(err);
     })
-    
+
+    const url = `${credentials.fresh_url}/api/orders/${id}?io_format=JSON&ws_key=${credentials.fresh_token}`;
+    axios.get(url)
+        .then(res => {
+            res.data.order.current_state = id_current_state;
+            axios.put(url, {
+                'body': {
+                    'order': OBJtoXML(res.data)
+                }
+            })
+                .then(r => {
+                    console.log('then');
+                    console.log(r)
+                })
+                .catch(err => {
+                    console.log('err');
+                    console.log(err)
+                })
+        })
+}
+
+function OBJtoXML(obj) {
+    let xml = '';
+    for (let prop in obj) {
+        xml += obj[prop] instanceof Array ? '' : "<" + prop + ">";
+        if (obj[prop] instanceof Array) {
+            for (var array in obj[prop]) {
+                xml += "<" + prop + ">";
+                xml += OBJtoXML(new Object(obj[prop][array]));
+                xml += "</" + prop + ">";
+            }
+        } else if (typeof obj[prop] == "object") {
+            xml += OBJtoXML(new Object(obj[prop]));
+        } else {
+            xml += obj[prop];
+        }
+        xml += obj[prop] instanceof Array ? '' : "</" + prop + ">";
+    }
+    return xml.replace(/<\/?[0-9]{1,}>/g, '');
 }
 
 export function getAddressDelivery(id, address) {
