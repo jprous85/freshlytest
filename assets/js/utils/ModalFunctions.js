@@ -1,16 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-
-export function getLocalStorage() {
-    const credentials = JSON.parse(document.getElementById('root').attributes['data-credentials'].nodeValue);
-    const order_states = JSON.parse(document.getElementById('root').attributes['data-order-states'].nodeValue);
-    const simple_order = JSON.parse(document.getElementById('root').attributes['data-simple-order'].nodeValue);
-    return {
-        'credentials': credentials,
-        'order_states': order_states,
-        'simple_order': simple_order
-    }
-}
+import {getAddressDelivery, getLocalStorage, getProductsAssociates} from "./OrderFunctions";
 
 export function fillModalDataOrder(order) {
     const array_values = [
@@ -161,31 +151,4 @@ function OBJtoXML(obj) {
         xml += obj[prop] instanceof Array ? '' : "</" + prop + ">";
     }
     return xml.replace(/<\/?[0-9]{1,}>/g, '');
-}
-
-export function getAddressDelivery(id, address) {
-    let address_delivery = {
-        address: '',
-        country: ''
-    }
-
-    address.map(a => {
-        if (a[0].id === parseInt(id)) {
-            address_delivery.address = `${a[0].address1}, 
-            ${a[0].address2},
-            ${a[0].postcode},
-            ${a[0].city}`;
-
-            address_delivery.country = `${a[1].name}`;
-        }
-    })
-    return address_delivery;
-}
-
-export function getProductsAssociates(products) {
-    let product = [];
-    products.map(p => {
-        product.push(p.product_name);
-    })
-    return product;
 }

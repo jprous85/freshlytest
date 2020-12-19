@@ -1,5 +1,6 @@
 import React from 'react';
-import {fillModalDataOrder, getAddressDelivery, getProductsAssociates} from "../utils/Calls";
+import {fillModalDataOrder} from "../utils/ModalFunctions";
+import {getAddressDelivery, getProductsAssociates} from "../utils/OrderFunctions";
 
 const TableOrders = (props) => {
     const {simple_order} = props;

@@ -29,7 +29,15 @@ class ConfigController extends AbstractController
      */
     public function config()
     {
-        return $this->render("config/fresh_config.html.twig");
+        return $this->render(
+            "config/fresh_config.html.twig",
+            [
+                "credentials" => [
+                    "fresh_url"     => $this->session->get('fresh_config')['fresh_url'],
+                    "fresh_token"   => $this->session->get('fresh_config')['fresh_token'],
+                ],
+            ]
+        );
     }
 
     /**
@@ -51,8 +59,10 @@ class ConfigController extends AbstractController
 
         if (intval($statusCode) == 200) {
             $this->session->set('fresh_config', $req);
+
             return new RedirectResponse($this->generateUrl('index_path'));
         }
+
         return new RedirectResponse($this->generateUrl('fresh_config_path'));
     }
 }

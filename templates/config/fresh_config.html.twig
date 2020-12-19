@@ -6,17 +6,18 @@
                 <div class="mb-3">
                     <div class="card">
                         <div class="card-body">
-                            <h4>Credentials of simple prestashop for Freshly test</h4>
+                            <h4>Credentials to simple prestashop for Freshly test</h4>
                             <form action="{{ path('fresh_config_post_path') }}" method="post">
                                 <label for="fresh_url" class="col-sm-2 col-form-label">Url</label>
                                 <div class="col">
                                     <input type="text" class="form-control" id="fresh_url" name="fresh_url"
-                                           value="">
+                                           value="{{ credentials.fresh_url }}">
+                                    <small>for example: http://example.com</small>
                                 </div>
                                 <label for="fresh_token" class="col-sm-2 col-form-label">Token</label>
                                 <div class="col">
                                     <input type="text" class="form-control" id="fresh_token" name="fresh_token"
-                                           value="">
+                                           value="{{ credentials.fresh_token }}">
                                 </div>
                                 <hr>
                                 <button type="submit" class="btn btn-primary">Save credentials</button>
