@@ -11,5 +11,5 @@
 // start the Stimulus application
 import './bootstrap';
 
-//import './js/app.js'
-import './js/custom.js'
+import './js/app.js'
+//import './js/custom.js'

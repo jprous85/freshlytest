@@ -62,12 +62,12 @@ class DefaultController extends AbstractController
         }
 
         return $this->render("orders/orders.html.twig", [
-            "simpleOrder"           => $simpleOrder,
-            "value_select_state"    => $request->request->get('filter_select_state'),
-            "filter_check_state"    => $request->request->get('filter_check_state'),
-            "order_states"          => $order_states,
-            "fresh_url"             => $this->session->get('fresh_config')['fresh_url'],
-            "fresh_token"           => $this->session->get('fresh_config')['fresh_token']
+            "simple_order"  => json_encode($simpleOrder),
+            "order_states"  => json_encode($order_states),
+            "credentials"   => json_encode([
+                "fresh_url"             => $this->session->get('fresh_config')['fresh_url'],
+                "fresh_token"           => $this->session->get('fresh_config')['fresh_token']
+            ]),
         ]);
     }
 
@@ -88,7 +88,7 @@ class DefaultController extends AbstractController
         curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query($data));
 
         $response = curl_exec($ch);
-
+        var_dump($response);
         if (!$response)
         {
             return false;
