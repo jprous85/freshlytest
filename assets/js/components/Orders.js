@@ -12,6 +12,16 @@ const Orders = () => {
 
     const listOrder = getStateList(simple_order, filter, changeState);
 
+    const listOrderTable = (listOrder.length !== 0) ? <TableOrders simple_order={listOrder} /> : (
+        <div className={"row"}>
+            <div className={"col-12"}>
+                <div className="alert alert-warning ">
+                    Sorry, but there are no results.
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className={"container"}>
             <div className="row mt-3">
@@ -38,9 +48,7 @@ const Orders = () => {
             </div>
             <div className="row mt-3">
                 <div className="col-12">
-                    <TableOrders
-                        simple_order={listOrder}
-                    />
+                    {listOrderTable}
                     <ModalOrder/>
                 </div>
             </div>

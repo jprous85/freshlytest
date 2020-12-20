@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -11,6 +9,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+use App\Utils\Constants;
+use App\Service\GeneralServices;
 
 class ConfigController extends AbstractController
 {
@@ -29,13 +30,20 @@ class ConfigController extends AbstractController
      */
     public function config()
     {
+        $generalService = new GeneralServices();
+        $credentials = [
+            Constants::FRESH_URL     => null,
+            Constants::FRESH_TOKEN   => null,
+        ];
+
+        if (isset($generalService->getConfigSession()[Constants::FRESH_URL]) &&
+            isset($generalService->getConfigSession()[Constants::FRESH_TOKEN])) {
+            $credentials = $generalService->getCredentials();
+        }
         return $this->render(
             "config/fresh_config.html.twig",
             [
-                "credentials" => [
-                    "fresh_url"     => $this->session->get('fresh_config')['fresh_url'],
-                    "fresh_token"   => $this->session->get('fresh_config')['fresh_token'],
-                ],
+                "credentials" => $credentials,
             ]
         );
     }
@@ -51,14 +59,14 @@ class ConfigController extends AbstractController
         $req = $request->request->all();
         $response = $this->client->request(
             'GET',
-            $req['fresh_url']
+            $req[Constants::FRESH_URL]
         );
 
         $statusCode = $response->getStatusCode();
 
 
         if (intval($statusCode) == 200) {
-            $this->session->set('fresh_config', $req);
+            $this->session->set(Constants::FRESH_CONFIG, $req);
 
             return new RedirectResponse($this->generateUrl('index_path'));
         }
