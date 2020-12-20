@@ -56,6 +56,53 @@ export function getStateList(order, filter, state) {
     return temp_array;
 }
 
+export function getCountryList(order, country) {
+    let orders = [];
+    let id_country;
+    
+    if (country) {
+        const countries = getCountryForOrder(order);
+        countries.map(c => {
+            if (c.name === country) id_country = c.id;
+        })
+
+        order.map(o => {
+            o.customer.addresses.map(oca => {
+                if (parseInt(o.id_address_delivery) === oca[0].id && id_country === oca[1].id) {
+                    orders.push(o);
+                }
+            });
+        })
+    }
+    else return order;
+
+    return orders;
+}
+
+export function getCountryForOrder(order) {
+    let countries = [];
+    
+    order.map(o => {
+        o.customer.addresses.map(oca => {
+            if (countries.length === 0) {
+                countries.push(oca[1])
+            } else {
+                let toBeInArray = false;
+                countries.map(c => {
+                    if (oca[1].id === c.id) {
+                        toBeInArray = true;
+                    }
+                })
+                if (!toBeInArray) {
+                    countries.push(oca[1]);
+                }
+            }
+        })
+    })
+
+    return countries;
+}
+
 export function getStateAcceptedAndSend(order) {
     const {order_states} = getLocalStorage();
     let order_state_id = [];
