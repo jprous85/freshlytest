@@ -55,3 +55,20 @@ export function getStateList(order, filter, state) {
     }
     return temp_array;
 }
+
+export function getStateAcceptedAndSend(order) {
+    const {order_states} = getLocalStorage();
+    let order_state_id = [];
+    let orders = [];
+    order_states.map(os => {
+        if (os.name === FILTER.ACCEPTED_PAY || os.name === FILTER.SENDED) {
+            order_state_id.push(os.id);
+        }
+    })
+    order.map(o => {
+        if (order_state_id.includes(parseInt(o.current_state))) {
+            orders.push(o);
+        }
+    })
+    return orders;
+}

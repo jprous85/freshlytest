@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {getLocalStorage, getStateList} from "../utils/OrderFunctions";
+import {getLocalStorage, getStateList, getStateAcceptedAndSend} from "../utils/OrderFunctions";
 import TableOrders from "./TableOrders";
 import ModalOrder from "./ModalOrder";
 import {FILTER} from '../utils/constants';
@@ -10,7 +10,15 @@ const Orders = () => {
     const [filter, setFilter] = useState('');
     const [changeState, setChangeState] = useState('');
 
-    const listOrder = getStateList(simple_order, filter, changeState);
+    let listOrder = getStateList(simple_order, filter, changeState);
+
+    let applyFilters;
+    if (filter.length !== 0 && filter === FILTER.STATUS) {
+        applyFilters = <StateFilter order={simple_order} changeState={changeState} setChangeState={setChangeState}/>
+    }
+    else if (filter.length !== 0 && filter === FILTER.ACCEPTED_PAY_SEND) {
+        listOrder = getStateAcceptedAndSend(simple_order);
+    }
 
     const listOrderTable = (listOrder.length !== 0) ? <TableOrders simple_order={listOrder} /> : (
         <div className={"row"}>
@@ -39,11 +47,11 @@ const Orders = () => {
                     }}>
                         <option value="">Apply filter</option>
                         <option value={FILTER.STATUS}>Filter for status</option>
+                        <option value={FILTER.ACCEPTED_PAY_SEND}>Show only "accepted pay" and "sended"</option>
                     </select>
                 </div>
                 <div className="col-6">
-                    {filter.length !== 0 &&
-                    <StateFilter order={simple_order} changeState={changeState} setChangeState={setChangeState}/>}
+                    {applyFilters}
                 </div>
             </div>
             <div className="row mt-3">
